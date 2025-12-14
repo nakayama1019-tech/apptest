@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>今月の運勢占い</title>
+  <style>
+:root{
+  --bg1:#0f1020;
+  --bg2:#111a3a;
+  --card: rgba(255,255,255,.08);
+  --card2: rgba(255,255,255,.12);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.65);
+  --line: rgba(255,255,255,.14);
+  --accent: #7c5cff;
+  --accent2:#2fe3c5;
+  --danger:#ff4d6d;
+}
+
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  min-height:100svh;
+  display:grid;
+  place-items:center;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Sans", "Helvetica Neue", Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(124,92,255,.35), transparent 55%),
+    radial-gradient(900px 600px at 80% 0%, rgba(47,227,197,.22), transparent 60%),
+    radial-gradient(1000px 800px at 50% 100%, rgba(255,77,109,.14), transparent 60%),
+    linear-gradient(160deg, var(--bg1), var(--bg2));
+}
+
+/* ===== Layout ===== */
+.app{ width:min(760px, 92vw); padding: 18px 0 20px; }
+.hero{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius: 22px;
+  overflow:hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  box-shadow: 0 18px 55px rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+}
+.hero__bg{
+  position:absolute; inset:-40px;
+  background:
+    radial-gradient(420px 260px at 20% 25%, rgba(124,92,255,.35), transparent 65%),
+    radial-gradient(380px 240px at 80% 25%, rgba(47,227,197,.22), transparent 62%),
+    radial-gradient(520px 320px at 50% 120%, rgba(255,77,109,.16), transparent 62%);
+  filter: blur(2px);
+  opacity:.95;
+  transform: translateZ(0);
+}
+.hero__content{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 14px;
+  padding: 16px 16px;
+}
+.brand{ display:flex; align-items:center; gap: 12px; }
+.brand__mark{
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  display:grid; place-items:center;
+  background: linear-gradient(135deg, rgba(124,92,255,.8), rgba(47,227,197,.7));
+  color:#0b0b18;
+  font-weight: 900;
+  box-shadow: 0 14px 35px rgba(0,0,0,.25);
+}
+.title{ margin:0; font-size: clamp(22px, 3vw, 30px); letter-spacing:.02em; }
+.subtitle{ margin: 4px 0 0; color:var(--muted); line-height:1.45; }
+
+.hero__figure{ margin:0; width: 124px; height: 124px; flex: 0 0 auto; }
+.crystal{
+  width:100%; height:100%;
+  filter: drop-shadow(0 18px 26px rgba(0,0,0,.35));
+  transform-origin: 50% 60%;
+}
+.spark{ opacity:.8; }
+
+.card{
+  margin-top: 14px;
+  border:1px solid var(--line);
+  background: linear-gradient(180deg, var(--card), rgba(255,255,255,.05));
+  border-radius: 22px;
+  padding: 16px;
+  box-shadow: 0 18px 55px rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+}
+
+.label{ display:block; font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+
+.row{ display:flex; gap: 10px; align-items: center; }
+.input{
+  flex: 1;
+  padding: 14px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(10,12,28,.45);
+  color: var(--text);
+  outline: none;
+  font-size: 15px;
+}
+.input:focus{
+  border-color: rgba(124,92,255,.6);
+  box-shadow: 0 0 0 4px rgba(124,92,255,.18);
+}
+
+.btn{
+  position:relative;
+  padding: 14px 14px;
+  border:0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0b0b18;
+  font-weight: 900;
+  letter-spacing: .02em;
+  cursor: pointer;
+  overflow:hidden;
+  white-space: nowrap;
+  transition: transform .08s ease, filter .2s ease;
+}
+.btn:hover{ filter: brightness(1.06); }
+.btn:active{ transform: translateY(1px) scale(.99); }
+.btn__shine{
+  position:absolute; inset:-40%;
+  background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%);
+  transform: translateX(-60%) rotate(10deg);
+  opacity:.0;
+}
+
+/* ===== Result ===== */
+.result{ margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; position:relative; }
+.result__head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 10px; }
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size: 13px; color: var(--muted);
+  padding: 8px 12px; border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.06);
+}
+.rank{ font-size: 18px; font-weight: 900; letter-spacing: .02em; }
+
+.result__grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.metric{ border:1px solid var(--line); border-radius: 16px; padding: 12px; background: rgba(255,255,255,.06); }
+.metric__label{ font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.metric__value{ margin-top: 8px; font-weight: 900; }
+
+.meter{ height: 10px; border-radius: 999px; background: rgba(255,255,255,.12); overflow:hidden; }
+.meter__bar{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width .75s cubic-bezier(.2,.9,.2,1);
+}
+
+.message{ margin-top: 10px; border:1px solid var(--line); border-radius: 16px; padding: 12px; background: rgba(255,255,255,.06); }
+.message__label{ font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.message__text{ line-height: 1.65; font-weight: 750; }
+
+.mini{ margin-top: 10px; display:flex; align-items:center; gap: 10px; color: var(--muted); font-size: 13px; }
+.mini__value{ color: var(--text); font-weight: 900; }
+.mini__dot{
+  width: 14px; height: 14px; border-radius: 50%;
+  border:1px solid rgba(255,255,255,.35);
+  background: rgba(255,255,255,.3);
+}
+
+/* 凶のときの枠 */
+.bad-action{
+  margin-top: 12px;
+  border:1px solid rgba(255,77,109,.35);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255,77,109,.12);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+.bad-action__img{ width: 44px; height: 44px; flex:0 0 auto; filter: drop-shadow(0 10px 18px rgba(0,0,0,.3)); }
+.bad-action__title{ font-weight: 900; }
+.bad-action__desc{ color: rgba(255,255,255,.78); font-size: 13px; margin-top: 2px; }
+.ghost{
+  border: 1px solid rgba(255,255,255,.28);
+  background: rgba(0,0,0,.18);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor:pointer;
+  font-weight: 900;
+}
+.ghost:hover{ filter: brightness(1.07); }
+
+.hint{ margin: 10px 2px 0; font-size: 12px; color: rgba(255,255,255,.55); }
+.footer{ text-align:center; margin-top: 14px; color: rgba(255,255,255,.45); font-size: 12px; }
+
+/* ===== FX Layer (JS particles) ===== */
+.fx{
+  position:absolute;
+  inset: 0;
+  pointer-events:none;
+  overflow:hidden;
+  border-radius: 18px;
+}
+.fx .p{
+  position:absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255,255,255,.95), rgba(255,255,255,0) 70%);
+  opacity: .95;
+  transform: translate(-50%,-50%) scale(.8);
+  animation: pop var(--t) cubic-bezier(.2,.9,.2,1) forwards;
+  filter: drop-shadow(0 10px 14px rgba(0,0,0,.25));
+}
+.fx .star{
+  position:absolute;
+  left: var(--x);
+  top: var(--y);
+  font-size: var(--s);
+  opacity:.95;
+  transform: translate(-50%,-50%) scale(.9) rotate(0deg);
+  animation: twirl var(--t) ease-out forwards;
+  text-shadow: 0 12px 18px rgba(0,0,0,.32);
+}
+
+/* ===== Animations ===== */
+@keyframes pop{
+  0%{ opacity:0; transform: translate(-50%,-50%) scale(.2); }
+  20%{ opacity:1; }
+  100%{ opacity:0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2); }
+}
+@keyframes twirl{
+  0%{ opacity:0; transform: translate(-50%,-50%) scale(.2) rotate(0deg); }
+  20%{ opacity:1; }
+  100%{ opacity:0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1) rotate(260deg); }
+}
+@keyframes shake{
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.shake{ animation: shake .55s ease-in-out 1; }
+
+@keyframes glow{
+  0% { box-shadow: 0 0 0 rgba(255,77,109,.0); }
+  50% { box-shadow: 0 0 26px rgba(255,77,109,.38); }
+  100% { box-shadow: 0 0 0 rgba(255,77,109,.0); }
+}
+.glow{ animation: glow .9s ease-in-out 1; }
+
+/* ヒーローのクリスタルをふわふわ（JSで強弱をつける） */
+@keyframes floaty{
+  0%,100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-6px) rotate(1deg); }
+}
+.floaty{ animation: floaty 3.4s ease-in-out infinite; }
+
+@keyframes blink {
+  0%,100%{ opacity:.45; }
+  50%{ opacity:1; }
+}
+.blink{ animation: blink 1.6s ease-in-out infinite; }
+
+@media (max-width: 560px){
+  .row{ flex-direction:column; align-items:stretch; }
+  .btn{ width:100%; }
+  .result__grid{ grid-template-columns: 1fr; }
+  .hero__figure{ width: 108px; height: 108px; }
+}
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <header class="hero">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__content">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">✦</div>
+        <div class="brand__text">
+          <h1 class="title">今月の運勢占い</h1>
+          <p class="subtitle">生年月日を入力して、今月の運勢をチェック。</p>
+        </div>
+      </div>
+
+      <figure class="hero__figure" aria-hidden="true">
+        <svg class="crystal" viewBox="0 0 200 200">
+          <defs>
+            <radialGradient id="g" cx="40%" cy="30%" r="80%">
+              <stop offset="0%" stop-color="rgba(255,255,255,.95)" />
+              <stop offset="45%" stop-color="rgba(124,92,255,.45)" />
+              <stop offset="100%" stop-color="rgba(47,227,197,.10)" />
+            </radialGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="rgba(124,92,255,.95)" />
+              <stop offset="100%" stop-color="rgba(47,227,197,.85)" />
+            </linearGradient>
+          </defs>
+          <circle cx="100" cy="100" r="70" fill="url(#g)" />
+          <path d="M100 24 L150 82 L125 168 L75 168 L50 82 Z" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.25)" />
+          <path d="M100 34 L138 86 L118 158 L82 158 L62 86 Z" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.22)" />
+          <path d="M100 34 L100 158" stroke="rgba(255,255,255,.18)" />
+          <circle class="spark s1" cx="46" cy="62" r="2.8" fill="url(#g2)" />
+          <circle class="spark s2" cx="154" cy="88" r="2.4" fill="url(#g2)" />
+          <circle class="spark s3" cx="66" cy="150" r="2.2" fill="url(#g2)" />
+        </svg>
+      </figure>
+    </div>
+  </header>
+
+  <main class="card">
+    <label class="label" for="birthday">生年月日</label>
+    <div class="row">
+      <input id="birthday" class="input" type="date" />
+      <button id="btn" class="btn" type="button">
+        <span class="btn__shine" aria-hidden="true"></span>
+        今月の運勢を見る
+      </button>
+    </div>
+
+    <div id="fxLayer" class="fx" aria-hidden="true"></div>
+
+    <section id="result" class="result" aria-live="polite">
+      <div class="result__head">
+        <span id="monthLabel" class="chip">-</span>
+        <span id="rankLabel" class="rank">-</span>
+      </div>
+
+      <div class="result__grid">
+        <div class="metric">
+          <div class="metric__label">総合運</div>
+          <div class="meter"><div id="barOverall" class="meter__bar" style="width:0%"></div></div>
+          <div id="txtOverall" class="metric__value">-</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric__label">恋愛運</div>
+          <div class="meter"><div id="barLove" class="meter__bar" style="width:0%"></div></div>
+          <div id="txtLove" class="metric__value">-</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric__label">仕事運</div>
+          <div class="meter"><div id="barWork" class="meter__bar" style="width:0%"></div></div>
+          <div id="txtWork" class="metric__value">-</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric__label">金運</div>
+          <div class="meter"><div id="barMoney" class="meter__bar" style="width:0%"></div></div>
+          <div id="txtMoney" class="metric__value">-</div>
+        </div>
+      </div>
+
+      <div class="message">
+        <div class="message__label">ひとことアドバイス</div>
+        <div id="advice" class="message__text">ここに結果が表示されます</div>
+      </div>
+
+      <div class="mini">
+        <span class="mini__label">ラッキーカラー</span>
+        <span id="luckyColor" class="mini__value">-</span>
+        <span class="mini__dot" id="colorDot"></span>
+      </div>
+
+      <div id="badAction" class="bad-action" hidden>
+        <img class="bad-action__img" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cdefs%3E%3CradialGradient id='a' cx='35%25' cy='30%25' r='80%25'%3E%3Cstop offset='0%25' stop-color='%23fff' stop-opacity='.95'/%3E%3Cstop offset='55%25' stop-color='%23ff4d6d' stop-opacity='.35'/%3E%3Cstop offset='100%25' stop-color='%23000' stop-opacity='.0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='48' cy='48' r='36' fill='url(%23a)'/%3E%3Cpath d='M48 10 L70 40 L58 82 L38 82 L26 40 Z' fill='%23ffffff' fill-opacity='.10' stroke='%23ffffff' stroke-opacity='.25'/%3E%3Cpath d='M48 20 L48 70' stroke='%23ffffff' stroke-opacity='.20'/%3E%3Cpath d='M44 34 L52 34 L50 56 L46 56 Z' fill='%23ffffff' fill-opacity='.75'/%3E%3Ccircle cx='48' cy='64' r='3' fill='%23ffffff' fill-opacity='.8'/%3E%3C/svg%3E" />
+        <div class="bad-action__text">
+          <div class="bad-action__title">ちょい注意月！</div>
+          <div class="bad-action__desc">深呼吸して、今月は“整える”が勝ち。</div>
+        </div>
+        <button id="shakeBtn" class="ghost" type="button">お清め</button>
+      </div>
+    </section>
+
+    <p class="hint">※入力内容は端末内で計算され、外部送信しません。</p>
+  </main>
+
+  <footer class="footer">© Fortune Month</footer>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  const birthdayEl = $("birthday");
+  const btn = $("btn");
+  const monthLabel = $("monthLabel");
+  const rankLabel = $("rankLabel");
+
+  const barOverall = $("barOverall");
+  const barLove = $("barLove");
+  const barWork = $("barWork");
+  const barMoney = $("barMoney");
+
+  const txtOverall = $("txtOverall");
+  const txtLove = $("txtLove");
+  const txtWork = $("txtWork");
+  const txtMoney = $("txtMoney");
+
+  const adviceEl = $("advice");
+  const luckyColorEl = $("luckyColor");
+  const colorDot = $("colorDot");
+
+  const badAction = $("badAction");
+  const shakeBtn = $("shakeBtn");
+  const resultBox = $("result");
+
+  const fxLayer = $("fxLayer");
+  const crystal = document.querySelector(".crystal");
+  const sparks = document.querySelectorAll(".spark");
+  const shine = document.querySelector(".btn__shine");
+
+  function mulberry32(seed) {
+    let t = seed >>> 0;
+    return function() {
+      t += 0x6D2B79F5;
+      let r = Math.imul(t ^ (t >>> 15), 1 | t);
+      r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+      return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+  function scoreText(v){
+    if (v >= 90) return "絶好調";
+    if (v >= 75) return "かなり良い";
+    if (v >= 60) return "良い";
+    if (v >= 45) return "ふつう";
+    if (v >= 30) return "控えめ";
+    return "要注意";
+  }
+
+  const colors = [
+    { name: "パープル", hex: "#7c5cff" },
+    { name: "ミント", hex: "#2fe3c5" },
+    { name: "ゴールド", hex: "#f7c948" },
+    { name: "スカイ", hex: "#4dc9ff" },
+    { name: "コーラル", hex: "#ff7a90" },
+    { name: "ホワイト", hex: "#ffffff" }
+  ];
+
+  const advicePool = [
+    "小さく始めて、淡々と続けるほど運が味方します。",
+    "連絡や返信は早めが吉。流れが一気に良くなります。",
+    "今月は“整える月”。片付け・整理・見直しが開運アクション。",
+    "直感よりも事実ベースで判断すると、勝ち筋が見えます。",
+    "予定を詰め込みすぎないで。余白がチャンスを呼びます。",
+    "学び・調べ物が当たり月。気になったらすぐメモ！",
+    "誰かのために動くほど、結果的に自分にも返ってきます。"
+  ];
+  const cautionAdvice = [
+    "焦りは禁物。今月は“守り”が強いです。確認を1回増やすだけで回避できます。",
+    "感情で決めない。寝かせてから決断すると後悔しにくいです。",
+    "無理な約束はしないのが吉。余裕のあるスケジュールが運を守ります。"
+  ];
+  const cleanseAdvice = [
+    "机の上を1分だけ片付ける→運気の通り道ができます。",
+    "今日は“早寝”が最強。回復すると流れも戻ります。",
+    "やることを3つに絞ると、今月は急に楽になります。"
+  ];
+
+  function buildSeed(dateObj) {
+    const y = dateObj.getFullYear();
+    const m = dateObj.getMonth() + 1;
+    const d = dateObj.getDate();
+    const now = new Date();
+    const ny = now.getFullYear();
+    const nm = now.getMonth() + 1;
+
+    const birthKey = y * 10000 + m * 100 + d;
+    const monthKey = ny * 100 + nm;
+    return (birthKey ^ (monthKey * 2654435761)) >>> 0;
+  }
+
+  function fortuneRank(overall){
+    if (overall >= 85) return "大吉";
+    if (overall >= 70) return "中吉";
+    if (overall >= 55) return "小吉";
+    if (overall >= 40) return "末吉";
+    return "凶";
+  }
+
+  function setMonthLabel(){
+    const now = new Date();
+    monthLabel.textContent = `${now.getFullYear()}年${now.getMonth()+1}月の運勢`;
+  }
+
+  function animateBars(scores){
+    barOverall.style.width = `${scores.overall}%`;
+    barLove.style.width = `${scores.love}%`;
+    barWork.style.width = `${scores.work}%`;
+    barMoney.style.width = `${scores.money}%`;
+
+    txtOverall.textContent = `${scores.overall} / 100（${scoreText(scores.overall)}）`;
+    txtLove.textContent = `${scores.love} / 100（${scoreText(scores.love)}）`;
+    txtWork.textContent = `${scores.work} / 100（${scoreText(scores.work)}）`;
+    txtMoney.textContent = `${scores.money} / 100（${scoreText(scores.money)}）`;
+  }
+
+  function clearFx(){ fxLayer.innerHTML = ""; }
+
+  function spawnBurst({ count = 14, star = false } = {}) {
+    const rect = fxLayer.getBoundingClientRect();
+    const cx = rect.width * 0.50;
+    const cy = rect.height * 0.14;
+
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement("div");
+      const isStar = star && Math.random() < 0.65;
+
+      if (isStar) {
+        el.className = "star";
+        el.textContent = ["✦","✧","✺","✹","✷"][Math.floor(Math.random()*5)];
+        el.style.setProperty("--s", `${12 + Math.random()*14}px`);
+      } else {
+        el.className = "p";
+        el.style.setProperty("--s", `${10 + Math.random()*18}px`);
+      }
+
+      const x = cx + (Math.random()*40 - 20);
+      const y = cy + (Math.random()*30 - 10);
+      const dx = (Math.random()*220 - 110) + "px";
+      const dy = (Math.random()*240 + 70) + "px";
+      const t  = (520 + Math.random()*520) + "ms";
+
+      el.style.setProperty("--x", `${x}px`);
+      el.style.setProperty("--y", `${y}px`);
+      el.style.setProperty("--dx", dx);
+      el.style.setProperty("--dy", dy);
+      el.style.setProperty("--t", t);
+
+      fxLayer.appendChild(el);
+      setTimeout(() => el.remove(), parseInt(t, 10) + 60);
+    }
+  }
+
+  function pulseCrystal(kind){
+    if (!crystal) return;
+
+    crystal.classList.add("floaty");
+    sparks.forEach(s => s.classList.add("blink"));
+
+    if (kind === "bad") {
+      crystal.style.transition = "transform 120ms ease";
+      crystal.style.transform = "translateY(2px) rotate(3deg)";
+      setTimeout(() => { crystal.style.transform = ""; }, 140);
+    } else {
+      crystal.style.transition = "transform 220ms ease";
+      crystal.style.transform = "translateY(-2px) rotate(-1deg)";
+      setTimeout(() => { crystal.style.transform = ""; }, 240);
+    }
+
+    setTimeout(() => sparks.forEach(s => s.classList.remove("blink")), 1400);
+  }
+
+  function buttonShine(){
+    if (!shine) return;
+    shine.style.transition = "none";
+    shine.style.opacity = "0";
+    shine.style.transform = "translateX(-60%) rotate(10deg)";
+    void shine.offsetWidth;
+    shine.style.transition = "transform 700ms ease, opacity 700ms ease";
+    shine.style.opacity = "1";
+    shine.style.transform = "translateX(55%) rotate(10deg)";
+    setTimeout(() => { shine.style.opacity = "0"; }, 720);
+  }
+
+  function showBadAction(isBad){
+    badAction.hidden = !isBad;
+    resultBox.classList.remove("shake", "glow");
+    if (isBad){
+      void resultBox.offsetWidth;
+      resultBox.classList.add("shake", "glow");
+    }
+  }
+
+  function draw() {
+    const val = birthdayEl.value;
+    if (!val) {
+      adviceEl.textContent = "生年月日を入力してください。";
+      rankLabel.textContent = "-";
+      animateBars({overall:0,love:0,work:0,money:0});
+      showBadAction(false);
+      clearFx();
+      return;
+    }
+
+    const dateObj = new Date(val);
+    if (Number.isNaN(dateObj.getTime())) {
+      adviceEl.textContent = "日付の形式が正しくありません。";
+      return;
+    }
+
+    setMonthLabel();
+    buttonShine();
+
+    clearFx();
+    spawnBurst({ count: 18, star: true });
+
+    const rng = mulberry32(buildSeed(dateObj));
+
+    const overall = clamp(Math.round(25 + rng()*75), 0, 100);
+    const love   = clamp(Math.round(20 + rng()*80), 0, 100);
+    const work   = clamp(Math.round(20 + rng()*80), 0, 100);
+    const money  = clamp(Math.round(20 + rng()*80), 0, 100);
+
+    animateBars({ overall, love, work, money });
+
+    const rank = fortuneRank(overall);
+    rankLabel.textContent = `結果：${rank}`;
+
+    const c = colors[Math.floor(rng() * colors.length)];
+    luckyColorEl.textContent = c.name;
+    colorDot.style.background = c.hex;
+
+    const isBad = (rank === "凶");
+    const pool = isBad ? cautionAdvice : advicePool;
+    adviceEl.textContent = pool[Math.floor(rng() * pool.length)];
+
+    showBadAction(isBad);
+    pulseCrystal(isBad ? "bad" : "good");
+
+    if (rank === "大吉") {
+      setTimeout(() => spawnBurst({ count: 10, star: true }), 220);
+      setTimeout(() => spawnBurst({ count: 8, star: true }), 420);
+    }
+
+    if (isBad) {
+      setTimeout(() => {
+        resultBox.classList.remove("shake");
+        void resultBox.offsetWidth;
+        resultBox.classList.add("shake");
+      }, 320);
+    }
+  }
+
+  shakeBtn?.addEventListener("click", () => {
+    clearFx();
+    spawnBurst({ count: 14, star: true });
+
+    resultBox.classList.remove("shake", "glow");
+    void resultBox.offsetWidth;
+    resultBox.classList.add("shake");
+
+    adviceEl.textContent = cleanseAdvice[Math.floor(Math.random() * cleanseAdvice.length)];
+    pulseCrystal("good");
+  });
+
+  btn.addEventListener("click", draw);
+  birthdayEl.addEventListener("keydown", (e) => { if (e.key === "Enter") draw(); });
+
+  setMonthLabel();
+  crystal?.classList.add("floaty");
+})();
+</script>
+
+</body>
+</html>
